@@ -1,7 +1,7 @@
-import * as vscode from 'vscode';
 import { Uri } from "vscode";
+import { workspace } from 'vscode';
 
-export async function getProjects(workspace: any) {
+export async function getProjects() {
     const packages = await workspace.findFiles('**/package.json', '**/node_modules/**');
     const results = {} as any;
 	packages.map((p: Uri) => {
@@ -12,14 +12,15 @@ export async function getProjects(workspace: any) {
     return results;
 }
 
-export async function getLocalizations(context: vscode.ExtensionContext, projects: any, workspace: any) {
+export async function getLocalizations(projects: any) {
+    const results = {} as any;
     const filesPromises = Object.keys(projects).map(async (key) => {
-        // const path = projects[key];
         const wholePath = `**/${key}/**/localization/**/strings.json`;
-        const thing = await workspace.findFiles(wholePath, '**/node_modules/**');
-        return thing;
+        const files = await workspace.findFiles(wholePath, '**/node_modules/**');
+        if (files.length > 0) {
+            results[key] = await workspace.findFiles(wholePath, '**/node_modules/**');
+        }
     });
-    
-    const files = await Promise.all(filesPromises);
-    return files;
+    await Promise.all(filesPromises);
+    return results;
 }

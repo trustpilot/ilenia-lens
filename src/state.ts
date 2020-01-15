@@ -7,3 +7,7 @@ export async function initIndex(context: vscode.ExtensionContext, projects: any)
     });
     await context.workspaceState.update('index', index);
 }
+
+export async function buildIndex(localizationFiles: any) {
+    //TODO: just do it
+}
