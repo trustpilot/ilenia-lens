@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { workspace } from "vscode";
-import { getProjects } from './projects';
+import { getProjects, getLocalizations } from './files';
 import { initIndex } from './state';
 
 // this method is called when your extension is activated
@@ -18,9 +18,11 @@ export async function activate(context: vscode.ExtensionContext) {
 	//console.log(workspace);
 	vscode.window.showInformationMessage('Hello World 2');
 
-	const projects = await getProjects(workspace);
-	await initIndex(context, projects);
-	console.log(context.workspaceState.get('index'));
+  const projects = await getProjects(workspace);
+  await initIndex(context, projects);
+  const files = await getLocalizations(context, projects, workspace);
+
+	console.log(files);
 
 	let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
 		// The code you place here will be executed every time your command is executed
