@@ -1,9 +1,11 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { languages } from 'vscode';
 import { getProjects, getLocalizations } from './files';
 import { initIndex, buildIndex } from './state';
 import { IleniaCompletionItemProvider } from './intelisense';
+import { CodelensProvider } from './codelens';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -20,6 +22,9 @@ export async function activate(context: vscode.ExtensionContext) {
   await initIndex(context, projects);
   const localizationFiles = await getLocalizations(projects);
   await buildIndex(context, localizationFiles);
+
+  let codelensProvider = new CodelensProvider(context.workspaceState.get('index'));
+  languages.registerCodeLensProvider('*', codelensProvider);
 
   let disposable = vscode.commands.registerCommand('extension.helloWorld', (event) => {
     // The code you place here will be executed every time your command is executed
