@@ -1,4 +1,4 @@
-import { Uri } from "vscode";
+import { Uri, ExtensionContext, TextDocument } from "vscode";
 import { workspace } from 'vscode';
 
 export async function getProjects() {
@@ -30,3 +30,10 @@ export async function getScripts(project: string) {
     return workspace.findFiles(wholePath, '**/node_modules/**');
 }
 
+export async function getCurrentProject(context: ExtensionContext, doc: TextDocument): Promise<string> {
+    const index = await context.workspaceState.get('index') as any;
+    const found = Object.keys(index).find((project: string) => {
+        return doc.uri.path.indexOf(project) !== -1;
+    });
+    return found || '';
+}
