@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { getProjects, getLocalizations } from './files';
 import { initIndex, buildIndex } from './state';
+import { IleniaCompletionItemProvider } from './intelisense';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -21,22 +22,28 @@ export async function activate(context: vscode.ExtensionContext) {
   await buildIndex(context, localizationFiles);
 
   let disposable = vscode.commands.registerCommand('extension.helloWorld', (event) => {
-      // The code you place here will be executed every time your command is executed
-      // Display a message box to the user
-      vscode.window.showInformationMessage('Hello World');
-      console.log(event);
+    // The code you place here will be executed every time your command is executed
+    // Display a message box to the user
+    vscode.window.showInformationMessage('Hello World');
+    console.log(event);
   });
 
   vscode.workspace.onDidOpenTextDocument((doc: vscode.TextDocument) => {
     const scriptExtensions = ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'];
     if (scriptExtensions.includes(doc.languageId) && doc.uri.scheme === "file") {
-      console.log(`You opened a ${doc.languageId} file`);
-      // Do stuff
+    console.log(`You opened a ${doc.languageId} file`);
+    // Do stuff
     }
   });
 
-
+  context.subscriptions.push(
+    vscode.languages.registerCompletionItemProvider(
+        ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'], new IleniaCompletionItemProvider(context), '\"'
+    )
+  );
+  
   context.subscriptions.push(disposable);
+  console.log('READY !!!');
 }
 
 // this method is called when your extension is deactivated
