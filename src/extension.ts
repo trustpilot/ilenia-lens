@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { languages } from 'vscode';
 import { getProjects, getLocalizations } from './files';
 import { initIndex, buildIndex } from './state';
-import { findReferences } from "./refs";
+import { findReferences, ReferenceProvider } from "./refs";
 import { IleniaCompletionItemProvider } from './intelisense';
 import { IleniaHoverProvider } from './hover';
 import { CodelensProvider } from './codelens';
@@ -55,6 +55,10 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.languages.registerHoverProvider(
       types, new IleniaHoverProvider(context)
     )
+  );
+
+  context.subscriptions.push(
+    vscode.languages.registerReferenceProvider({language: 'json'}, new ReferenceProvider(context))
   );
 
   context.subscriptions.push(disposable);
