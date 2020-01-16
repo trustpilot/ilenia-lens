@@ -4,14 +4,15 @@ import * as vscode from 'vscode';
 import { languages } from 'vscode';
 import { getProjects, getLocalizations } from './files';
 import { initIndex, buildIndex } from './state';
-import {findReferences} from "./refs";
+import { findReferences } from "./refs";
 import { IleniaCompletionItemProvider } from './intelisense';
+import { IleniaHoverProvider } from './hover';
 import { CodelensProvider } from './codelens';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
-
+  const types = ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'];
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	// The command has been defined in the package.json file
@@ -37,8 +38,7 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.window.onDidChangeActiveTextEditor(async (editor: vscode.TextEditor | undefined) => {
     if (editor) {
       const doc = editor.document;
-      const scriptExtensions = ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'];
-      if (scriptExtensions.includes(doc.languageId) && doc.uri.scheme === "file") {
+      if (types.includes(doc.languageId) && doc.uri.scheme === "file") {
         console.log(`You opened a ${doc.languageId} file`);
         await findReferences(context, doc);
       }
@@ -47,7 +47,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
-        ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'], new IleniaCompletionItemProvider(context), '\"'
+      types, new IleniaCompletionItemProvider(context), '\"'
+    )
+  );
+  
+  context.subscriptions.push(
+    vscode.languages.registerHoverProvider(
+      types, new IleniaHoverProvider(context)
     )
   );
 
