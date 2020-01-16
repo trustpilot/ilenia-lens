@@ -49,6 +49,6 @@ export async function buildIndex(context: vscode.ExtensionContext, localizationF
     });
     await Promise.all(promises);
     // Dump state
-    fs.writeFileSync('/Users/vda/IdeaProjects/ilenia-lens/state.json', JSON.stringify(index, null, 2), 'utf8');
+    // fs.writeFileSync('/Users/vda/IdeaProjects/ilenia-lens/state.json', JSON.stringify(index, null, 2), 'utf8');
     await context.workspaceState.update('index', index);
 }

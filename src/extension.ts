@@ -4,11 +4,12 @@ import * as vscode from 'vscode';
 import { getProjects, getLocalizations } from './files';
 import { initIndex, buildIndex } from './state';
 import { IleniaCompletionItemProvider } from './intelisense';
+import { IleniaHoverProvider } from './hover';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
-
+  const languages = ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'];
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	// The command has been defined in the package.json file
@@ -29,8 +30,7 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   vscode.workspace.onDidOpenTextDocument((doc: vscode.TextDocument) => {
-    const scriptExtensions = ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'];
-    if (scriptExtensions.includes(doc.languageId) && doc.uri.scheme === "file") {
+    if (languages.includes(doc.languageId) && doc.uri.scheme === "file") {
     console.log(`You opened a ${doc.languageId} file`);
     // Do stuff
     }
@@ -38,10 +38,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
-        ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'], new IleniaCompletionItemProvider(context), '\"'
+      languages, new IleniaCompletionItemProvider(context), '\"'
     )
   );
   
+  context.subscriptions.push(
+    vscode.languages.registerHoverProvider(
+      languages, new IleniaHoverProvider(context)
+    )
+  );
+
   context.subscriptions.push(disposable);
   console.log('READY !!!');
 }
