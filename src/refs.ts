@@ -14,7 +14,7 @@ export async function findReferences(context: vscode.ExtensionContext, doc: vsco
     const scriptFile = (await vscode.workspace.openTextDocument(uri));
     const scriptText = scriptFile.getText();
     const promises = Object.keys(projectIndex.translations).map(async (translationId: string) => {
-      const regex = new RegExp(translationId, 'g');
+      const regex = new RegExp(`["|']${translationId}["|']`, 'g');
       let match;
       const locations = [];
       while ((match = regex.exec(scriptText)) !== null) {
