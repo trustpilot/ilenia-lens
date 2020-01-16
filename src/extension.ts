@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { getProjects, getLocalizations } from './files';
 import { initIndex, buildIndex } from './state';
+import {findReferences} from "./refs";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -27,11 +28,11 @@ export async function activate(context: vscode.ExtensionContext) {
       console.log(event);
   });
 
-  vscode.workspace.onDidOpenTextDocument((doc: vscode.TextDocument) => {
+  vscode.workspace.onDidOpenTextDocument(async (doc: vscode.TextDocument) => {
     const scriptExtensions = ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'];
     if (scriptExtensions.includes(doc.languageId) && doc.uri.scheme === "file") {
       console.log(`You opened a ${doc.languageId} file`);
-      // Do stuff
+      await findReferences(context, doc);
     }
   });
 
