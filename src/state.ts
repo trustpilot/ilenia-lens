@@ -36,7 +36,7 @@ export async function buildIndex(context: vscode.ExtensionContext, localizationF
                             languages: {
                                 [localizationCode]: localizationStrings[localizationId],
                             },
-                            refs: {},
+                            refs: [],
                         };
                     }
                 });

@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import { languages } from 'vscode';
 import { getProjects, getLocalizations } from './files';
 import { initIndex, buildIndex } from './state';
+import { findReferences } from "./refs";
 import { IleniaCompletionItemProvider } from './intelisense';
 import { IleniaHoverProvider } from './hover';
 import { CodelensProvider } from './codelens';
@@ -34,10 +35,13 @@ export async function activate(context: vscode.ExtensionContext) {
     console.log(event);
   });
 
-  vscode.workspace.onDidOpenTextDocument((doc: vscode.TextDocument) => {
-    if (types.includes(doc.languageId) && doc.uri.scheme === "file") {
-    console.log(`You opened a ${doc.languageId} file`);
-    // Do stuff
+  vscode.window.onDidChangeActiveTextEditor(async (editor: vscode.TextEditor | undefined) => {
+    if (editor) {
+      const doc = editor.document;
+      if (types.includes(doc.languageId) && doc.uri.scheme === "file") {
+        console.log(`You opened a ${doc.languageId} file`);
+        await findReferences(context, doc);
+      }
     }
   });
 
