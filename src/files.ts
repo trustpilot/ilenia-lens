@@ -24,3 +24,9 @@ export async function getLocalizations(projects: any) {
     await Promise.all(filesPromises);
     return results;
 }
+
+export async function getScripts(project: string) {
+    const wholePath = `**/${project}/**/*.{js,jsx,ts,tsx}`;
+    return workspace.findFiles(wholePath, '**/node_modules/**');
+}
+

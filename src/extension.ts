@@ -28,11 +28,14 @@ export async function activate(context: vscode.ExtensionContext) {
       console.log(event);
   });
 
-  vscode.workspace.onDidOpenTextDocument(async (doc: vscode.TextDocument) => {
-    const scriptExtensions = ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'];
-    if (scriptExtensions.includes(doc.languageId) && doc.uri.scheme === "file") {
-      console.log(`You opened a ${doc.languageId} file`);
-      await findReferences(context, doc);
+  vscode.window.onDidChangeActiveTextEditor(async (editor: vscode.TextEditor | undefined) => {
+    if (editor) {
+      const doc = editor.document;
+      const scriptExtensions = ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'];
+      if (scriptExtensions.includes(doc.languageId) && doc.uri.scheme === "file") {
+        console.log(`You opened a ${doc.languageId} file`);
+        await findReferences(context, doc);
+      }
     }
   });
 
