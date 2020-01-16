@@ -24,21 +24,25 @@ export async function buildIndex(context: vscode.ExtensionContext, localizationF
             const file = await vscode.workspace.fs.readFile(uri); // Returns file bytestream
 
             const localizationCode = uriPathSplit[uriPathSplit.length - 2]; // extract lang code from filepath
-            const localizationStrings = flatten(JSON.parse(file.toString()));
-            const localizationIds = Object.keys(localizationStrings);
-            localizationIds.map((localizationId: string) => {
-                const translations = index[project].translations;
-                if (translations.hasOwnProperty(localizationId)) {
-                    translations[localizationId].languages[localizationCode] = localizationStrings[localizationId];
-                } else {
-                    translations[localizationId] = {
-                        languages: {
-                           [localizationCode]: localizationStrings[localizationId],
-                        },
-                        refs: {},
-                    };
-                }
-            });
+            try {
+                const localizationStrings = flatten(JSON.parse(file.toString()));
+                const localizationIds = Object.keys(localizationStrings);
+                localizationIds.map((localizationId: string) => {
+                    const translations = index[project].translations;
+                    if (translations.hasOwnProperty(localizationId)) {
+                        translations[localizationId].languages[localizationCode] = localizationStrings[localizationId];
+                    } else {
+                        translations[localizationId] = {
+                            languages: {
+                                [localizationCode]: localizationStrings[localizationId],
+                            },
+                            refs: {},
+                        };
+                    }
+                });
+            } catch (e) {
+                return;
+            }
             index[project].locales[localizationCode] = uri;
         });
         await Promise.all(promises);
