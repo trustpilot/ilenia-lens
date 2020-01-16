@@ -35,6 +35,12 @@ export async function activate(context: vscode.ExtensionContext) {
     console.log(event);
   });
 
+  vscode.commands.registerCommand("ilenia-lens.codelensAction", (args) => {
+    vscode.window.activeTextEditor?.edit((editBuilder) => {
+      editBuilder.delete(args);
+    });
+  });
+
   vscode.window.onDidChangeActiveTextEditor(async (editor: vscode.TextEditor | undefined) => {
     if (editor) {
       const doc = editor.document;

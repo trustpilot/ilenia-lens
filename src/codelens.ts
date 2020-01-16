@@ -19,7 +19,6 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     }
 
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
-        
         if (this.index && document.languageId === 'json' && document.fileName.endsWith('strings.json')) {
             const project = Object.keys(this.index).find((project: string) => {
                 return document.uri.path.indexOf(project) !== -1;
@@ -35,16 +34,21 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 Object.keys(localizationStrings).map((key) => {
                     if (Object.keys(translations[key].refs).length === 0) {
                         const splits = key.split('.');
-                        splits.map((split) => {
-                            let line = document.lineAt(document.positionAt(text.indexOf(split)).line);
-                            let indexOf = line.text.indexOf(split);
-                            let position = new vscode.Position(line.lineNumber, indexOf);
-                            let range = document.getWordRangeAtPosition(position, new RegExp(this.regex));
-                            if (range && !lensCache[split]) {
-                                lensCache[split] = 1;
-                                this.codeLenses.push(new vscode.CodeLens(range));
-                            }
-                        });
+                        const split = splits[splits.length - 1];
+                        const line = document.lineAt(document.positionAt(text.indexOf(split)).line);
+                        const indexOf = line.text.lastIndexOf(split);
+                        const position = new vscode.Position(line.lineNumber, indexOf);
+                        const range = document.getWordRangeAtPosition(position, new RegExp(this.regex));
+                        if (range && !lensCache[split]) {
+                            lensCache[split] = 1;
+                            const command: vscode.Command = {
+                                title: "Remove unused translation",
+                                tooltip: "Tooltip provided by sample extension",
+                                command: "ilenia-lens.codelensAction",
+                                arguments: [range]
+                            };
+                            this.codeLenses.push(new vscode.CodeLens(range, command));
+                        }
                     }
                 });
                 return this.codeLenses;
@@ -52,15 +56,5 @@ export class CodelensProvider implements vscode.CodeLensProvider {
         }
 
         return [];
-    }
-
-    public resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken) {
-        codeLens.command = {
-            title: "Translation possibly unused",
-            // tooltip: "Tooltip provided by sample extension",
-            command: "",
-            // arguments: ["Argument 1", false]
-        };
-        return codeLens;
     }
 }
