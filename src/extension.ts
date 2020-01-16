@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { getProjects, getLocalizations } from './files';
 import { initIndex, buildIndex } from './state';
+import { IleniaCompletionItemProvider } from './intelisense';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -26,7 +27,14 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage('Hello World');
     });
 
-    context.subscriptions.push(disposable);
+	context.subscriptions.push(disposable);
+	
+    context.subscriptions.push(
+        vscode.languages.registerCompletionItemProvider(
+            ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'], new IleniaCompletionItemProvider(context), '\"'
+        )
+    );
+    console.log('READY !!!');
 }
 
 // this method is called when your extension is deactivated
