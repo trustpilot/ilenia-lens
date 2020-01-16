@@ -25,6 +25,11 @@ export async function getLocalizations(projects: any) {
     return results;
 }
 
+export async function getScripts(project: string) {
+    const wholePath = `**/${project}/**/*.{js,jsx,ts,tsx}`;
+    return workspace.findFiles(wholePath, '**/node_modules/**');
+}
+
 export async function getCurrentProject(context: ExtensionContext, doc: TextDocument): Promise<string> {
     const index = await context.workspaceState.get('index') as any;
     const found = Object.keys(index).find((project: string) => {
