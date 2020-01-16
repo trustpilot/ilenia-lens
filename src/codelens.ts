@@ -43,9 +43,8 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                             lensCache[split] = 1;
                             const command: vscode.Command = {
                                 title: "Remove unused translation",
-                                tooltip: "Tooltip provided by sample extension",
                                 command: "ilenia-lens.codelensAction",
-                                arguments: [range]
+                                arguments: [range],
                             };
                             this.codeLenses.push(new vscode.CodeLens(range, command));
                         }
