@@ -41,6 +41,8 @@ export async function activate(context: vscode.ExtensionContext) {
         ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'], new IleniaCompletionItemProvider(context), '\"'
     )
   );
+  
+  context.subscriptions.push(disposable);
   console.log('READY !!!');
 }
 
