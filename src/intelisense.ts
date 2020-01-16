@@ -6,7 +6,6 @@ export class IleniaCompletionItemProvider implements CompletionItemProvider {
 
     public constructor(context: ExtensionContext) {
         this.context = context;
-        console.log(context.extensionPath);
     }
 
     public async provideCompletionItems(document: TextDocument, position: Position): Promise<CompletionItem[]> {
