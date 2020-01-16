@@ -20,13 +20,23 @@ export async function activate(context: vscode.ExtensionContext) {
   const localizationFiles = await getLocalizations(projects);
   await buildIndex(context, localizationFiles);
 
-    let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
-        // The code you place here will be executed every time your command is executed
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World');
-    });
+  let disposable = vscode.commands.registerCommand('extension.helloWorld', (event) => {
+      // The code you place here will be executed every time your command is executed
+      // Display a message box to the user
+      vscode.window.showInformationMessage('Hello World');
+      console.log(event);
+  });
 
-    context.subscriptions.push(disposable);
+  vscode.workspace.onDidOpenTextDocument((doc: vscode.TextDocument) => {
+    const scriptExtensions = ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'];
+    if (scriptExtensions.includes(doc.languageId) && doc.uri.scheme === "file") {
+      console.log(`You opened a ${doc.languageId} file`);
+      // Do stuff
+    }
+  });
+
+
+  context.subscriptions.push(disposable);
 }
 
 // this method is called when your extension is deactivated
