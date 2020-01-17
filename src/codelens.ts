@@ -35,20 +35,24 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                     if (translations[translationId] && translations[translationId].refs.length === 0) {
                         const splits = translationId.split('.');
                         const split = splits[splits.length - 1];
-                        const line = document.lineAt(document.positionAt(text.indexOf(split)).line);
-                        const indexOf = line.text.lastIndexOf(split);
-                        const position = new vscode.Position(line.lineNumber, indexOf);
-                        const range = document.getWordRangeAtPosition(position, new RegExp(this.regex));
-                        const lookUpString = text.slice(0, document.offsetAt(range!.end));
-                        const lookUpTranslationId = reverseTraverse(lookUpString, split);
-                        if (translationId === lookUpTranslationId && range && !lensCache[split]) {
-                            lensCache[split] = 1;
-                            const command: vscode.Command = {
-                                title: "Remove unused translation",
-                                command: "ilenia-lens.codelensAction",
-                                arguments: [range],
-                            };
-                            this.codeLenses.push(new vscode.CodeLens(range, command));
+                        const regex = new RegExp(`["|']${split}["|']`, 'g');
+                        const match = regex.exec(text);
+                        if (match) {
+                            const line = document.lineAt(document.positionAt(match.index).line);
+                            const indexOf = line.text.lastIndexOf(split);
+                            const position = new vscode.Position(line.lineNumber, indexOf);
+                            const range = document.getWordRangeAtPosition(position, new RegExp(this.regex));
+                            const lookUpString = text.slice(0, document.offsetAt(range!.end));
+                            const lookUpTranslationId = reverseTraverse(lookUpString, split);
+                            if (translationId === lookUpTranslationId && range && !lensCache[split]) {
+                                lensCache[split] = 1;
+                                const command: vscode.Command = {
+                                    title: "Remove unused translation",
+                                    command: "ilenia-lens.codelensAction",
+                                    arguments: [range],
+                                };
+                                this.codeLenses.push(new vscode.CodeLens(range, command));
+                            }
                         }
                     }
                 });
