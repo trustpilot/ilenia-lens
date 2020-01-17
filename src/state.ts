@@ -77,5 +77,5 @@ export async function rebuildIndex(context: vscode.ExtensionContext, uri: vscode
         }
     });
     index[project].locales[localizationCode] = uri;
-    context.workspaceState.update('index', index);
+    await context.workspaceState.update('index', index);
 }
