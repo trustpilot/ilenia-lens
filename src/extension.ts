@@ -9,6 +9,7 @@ import { IleniaCompletionItemProvider } from './intelisense';
 import { IleniaHoverProvider } from './hover';
 import { CodelensProvider } from './codelens';
 import { underline } from './underline';
+import { IleniaDefinitionProvider } from './definition';
 
 export const types = ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'];
 
@@ -20,7 +21,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-
 
   const projects = await getProjects();
   await initIndex(context, projects);
@@ -80,6 +80,10 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.window.showInformationMessage('Hello World');
     console.log(event);
   }));
+
+  context.subscriptions.push(
+    vscode.languages.registerDefinitionProvider(types, new IleniaDefinitionProvider(context))
+  );
 
   console.log('READY !!!');
 }
