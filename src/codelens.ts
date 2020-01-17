@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import flatten from './flatten';
+import { flatten, reverseTraverse } from './flatten';
 
 export class CodelensProvider implements vscode.CodeLensProvider {
 
@@ -31,15 +31,17 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 const translations = this.index[project].translations;
 
                 const lensCache = {} as any;
-                Object.keys(localizationStrings).map((key) => {
-                    if (Object.keys(translations[key].refs).length === 0) {
-                        const splits = key.split('.');
+                Object.keys(localizationStrings).map((translationId) => {
+                    if (translations[translationId].refs.length === 0) {
+                        const splits = translationId.split('.');
                         const split = splits[splits.length - 1];
                         const line = document.lineAt(document.positionAt(text.indexOf(split)).line);
                         const indexOf = line.text.lastIndexOf(split);
                         const position = new vscode.Position(line.lineNumber, indexOf);
                         const range = document.getWordRangeAtPosition(position, new RegExp(this.regex));
-                        if (range && !lensCache[split]) {
+                        const lookUpString = text.slice(0, document.offsetAt(range!.end));
+                        const lookUpTranslationId = reverseTraverse(lookUpString, split);
+                        if (translationId === lookUpTranslationId && range && !lensCache[split]) {
                             lensCache[split] = 1;
                             const command: vscode.Command = {
                                 title: "Remove unused translation",

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import flatten from "./flatten";
-let fs = require("fs");
+import { flatten } from "./flatten";
+// let fs = require("fs");
 
 export async function initIndex(context: vscode.ExtensionContext, projects: any) {
     const index = {} as any;
