@@ -8,11 +8,13 @@ import { findReferences, ReferenceProvider } from "./refs";
 import { IleniaCompletionItemProvider } from './intelisense';
 import { IleniaHoverProvider } from './hover';
 import { CodelensProvider } from './codelens';
+import { underline } from './underline';
+
+export const types = ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'];
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
-  const types = ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'];
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	// The command has been defined in the package.json file
@@ -27,13 +29,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   let codelensProvider = new CodelensProvider(context.workspaceState.get('index'));
   languages.registerCodeLensProvider('*', codelensProvider);
-
-  let disposable = vscode.commands.registerCommand('extension.helloWorld', (event) => {
-    // The code you place here will be executed every time your command is executed
-    // Display a message box to the user
-    vscode.window.showInformationMessage('Hello World');
-    console.log(event);
-  });
 
   vscode.commands.registerCommand("ilenia-lens.codelensAction", (args) => {
     vscode.window.activeTextEditor?.edit((editBuilder) => {
@@ -67,7 +62,16 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.languages.registerReferenceProvider({language: 'json'}, new ReferenceProvider(context))
   );
 
-  context.subscriptions.push(disposable);
+  
+  underline(context); //.forEach(disposable => context.subscriptions.push(disposable));
+
+  context.subscriptions.push(vscode.commands.registerCommand('extension.helloWorld', (event) => {
+    // The code you place here will be executed every time your command is executed
+    // Display a message box to the user
+    vscode.window.showInformationMessage('Hello World');
+    console.log(event);
+  }));
+
   console.log('READY !!!');
 }
 
