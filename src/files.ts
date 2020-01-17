@@ -27,7 +27,7 @@ export async function getLocalizations(projects: any) {
 
 export async function getScripts(project: string) {
     const wholePath = `**/${project}/**/*.{js,jsx,ts,tsx}`;
-    return workspace.findFiles(wholePath, '**/node_modules/**');
+    return workspace.findFiles(wholePath, '**/{node_modules,dist,build}/**');
 }
 
 export async function getCurrentProject(context: ExtensionContext, doc: TextDocument): Promise<string> {
