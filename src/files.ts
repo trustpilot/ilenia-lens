@@ -2,7 +2,7 @@ import { Uri, ExtensionContext, TextDocument } from "vscode";
 import { workspace } from 'vscode';
 
 export async function getProjects() {
-    const packages = await workspace.findFiles('**/package.json', '**/node_modules/**');
+    const packages = await workspace.findFiles('**/package.json', '**/{node_modules,dist,build}/**');
     const results = {} as any;
 	packages.map((p: Uri) => {
         const pathSplit = p.path.split('/');
@@ -16,7 +16,7 @@ export async function getLocalizations(projects: any) {
     const results = {} as any;
     const filesPromises = Object.keys(projects).map(async (key) => {
         const wholePath = `**/${key}/**/localization/**/strings.json`;
-        const files = await workspace.findFiles(wholePath, '**/node_modules/**');
+        const files = await workspace.findFiles(wholePath, '**/{node_modules,dist,build}/**');
         if (files.length > 0) {
             results[key] = files;
         }
