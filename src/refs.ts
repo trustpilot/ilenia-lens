@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
-import {getCurrentProject, getScripts} from "./files";
-import {CancellationToken, Location, Position, ReferenceContext, TextDocument} from "vscode";
+import { getCurrentProject, getScripts } from "./files";
+import { CancellationToken, Location, Position, ReferenceContext, TextDocument } from "vscode";
+import { reverseTraverse } from './flatten';
+// let fs = require("fs");
 
 export async function findReferences(context: vscode.ExtensionContext, doc: vscode.TextDocument) {
   const index = context.workspaceState.get('index') as any;
@@ -29,7 +31,8 @@ export async function findReferences(context: vscode.ExtensionContext, doc: vsco
     await Promise.all(promises);
   });
   await Promise.all(promises);
-  await context.workspaceState.update('index', index);
+  // fs.writeFileSync('/Users/pov/git/hackathon/ilenia-lens/state.json', JSON.stringify(index, null, 2), 'utf8');
+  await context.workspaceState.update('index', index);  
 }
 
 export class ReferenceProvider implements vscode.ReferenceProvider {
@@ -47,30 +50,9 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
   }
 
   private static getFlattenedTranslationId(document: TextDocument, position: Position) {
-    const translationIdPath = [] as string[];
     const range = document.getWordRangeAtPosition(position);
     const key = document.getText(range).replace(/"/g, "");
-    translationIdPath.push(key);
     const lookUpString = document.getText().slice(0, document.offsetAt(range!.end));
-    let bracketIndex = 0;
-    for (let i = lookUpString.length - 1; i >= 0; i--) {
-      if (lookUpString[i] === '{') {
-        if (bracketIndex === 0) {
-          const slice = lookUpString.slice(0, i);
-          const matches = slice.match(/"(.*?)"/g);
-          if (!matches) {
-            break;
-          }
-          const parentKey = matches[matches.length - 1].replace(/"/g, "");
-          translationIdPath.push(parentKey);
-        } else {
-          bracketIndex -= 1;
-        }
-      }
-      if (lookUpString[i] === '}') {
-        bracketIndex += 1;
-      }
-    }
-    return translationIdPath.reverse().join('.');
+    return reverseTraverse(lookUpString, key);
   }
 }
