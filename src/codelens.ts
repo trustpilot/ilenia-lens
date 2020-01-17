@@ -32,7 +32,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 
                 const lensCache = {} as any;
                 Object.keys(localizationStrings).map((translationId) => {
-                    if (translations[translationId].refs.length === 0) {
+                    if (translations[translationId] && translations[translationId].refs.length === 0) {
                         const splits = translationId.split('.');
                         const split = splits[splits.length - 1];
                         const line = document.lineAt(document.positionAt(text.indexOf(split)).line);
