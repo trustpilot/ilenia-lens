@@ -12,6 +12,10 @@ export async function findReferences(context: vscode.ExtensionContext, doc: vsco
   // Will need to do something about it in the future!
   const scripts = await getScripts(project);
   const projectIndex = index[project];
+  // Hotfix: cleanup all refs before reindex
+  Object.keys(projectIndex.translations).map((translationId: string) => {
+    projectIndex.translations[translationId].refs = [];
+  });
   const promises = scripts.map(async (uri: vscode.Uri) => {
     const scriptFile = (await vscode.workspace.openTextDocument(uri));
     const scriptText = scriptFile.getText();
@@ -24,9 +28,7 @@ export async function findReferences(context: vscode.ExtensionContext, doc: vsco
         const endPosition = position.translate(0, translationId.length);
         locations.push(new Location(uri, new vscode.Range(position, endPosition)));
       }
-      if (locations.length > 0) {
-        projectIndex.translations[translationId].refs = locations;
-      }
+      projectIndex.translations[translationId].refs = [...projectIndex.translations[translationId].refs, ...locations];
     });
     await Promise.all(promises);
   });
