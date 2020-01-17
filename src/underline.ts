@@ -2,15 +2,11 @@ import { ExtensionContext, window, OverviewRulerLane, DecorationOptions, Range, 
 import { types } from './extension';
 import { getCurrentProject } from './files';
 
-const noDecoration = window.createTextEditorDecorationType({});
-
 const errorDecoration = window.createTextEditorDecorationType({
-    overviewRulerColor: 'red',
-    overviewRulerLane: OverviewRulerLane.Right,
-    textDecoration: 'red wavy underline'
+    textDecoration: 'underline yellow wavy',
 });
 
-export function underline(context: ExtensionContext): Disposable[] {
+export async function underline(context: ExtensionContext): Promise<Disposable[]> {
 	let timeout: NodeJS.Timer | undefined = undefined;
   let activeEditor = window.activeTextEditor;
   
@@ -20,10 +16,6 @@ export function underline(context: ExtensionContext): Disposable[] {
 			timeout = undefined;
 		}
 		timeout = setTimeout(updateUnderlines, 500);
-	}
-
-	if (window.activeTextEditor) {
-		triggerUpdateDecorations();
 	}
 
 	const editorListener = window.onDidChangeActiveTextEditor(editor => {
@@ -61,24 +53,19 @@ export function underline(context: ExtensionContext): Disposable[] {
 
     const text = document.getText();
     const ids = findIds(text);
-    console.log(JSON.stringify(ids, null, 2));
     const errors: DecorationOptions[] = [];
-    const normal: DecorationOptions[] = [];
 
     ids.forEach(({ id, start, end }) => {
       const range = new Range(document.positionAt(start), document.positionAt(end));
-      if (translations[id]) {
-        normal.push({ range });
-      } else {
+      if (!translations[id]) {
         errors.push({ range });
       }
     });
 
     activeEditor.setDecorations(errorDecoration, errors);
-    activeEditor.setDecorations(noDecoration, normal);
   }
 
-  updateUnderlines();
+  await updateUnderlines();
 
   return [editorListener, documentListener];
 }
@@ -92,7 +79,7 @@ export interface MatchedId {
 
 export function findIds(text: string): MatchedId[] {
   const regexps = [
-    RegExp('id=[\'\"`]([[\\w\\d\\. \\-\\[\\]]*?)[\'\"`]'),
+    / id=['"`]([[\w\d\. \-\[\]]*?)['"`]/g,
   ];
   
   const ids = [];

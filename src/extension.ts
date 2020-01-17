@@ -72,7 +72,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   
-  underline(context); //.forEach(disposable => context.subscriptions.push(disposable));
+  (await underline(context)).forEach(disposable => context.subscriptions.push(disposable));
 
   context.subscriptions.push(vscode.commands.registerCommand('extension.helloWorld', (event) => {
     // The code you place here will be executed every time your command is executed
