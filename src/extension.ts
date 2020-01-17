@@ -8,6 +8,7 @@ import { findReferences, ReferenceProvider } from "./refs";
 import { IleniaCompletionItemProvider } from './intelisense';
 import { IleniaHoverProvider } from './hover';
 import { CodelensProvider } from './codelens';
+import { IleniaDefinitionProvider } from './definition';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -74,6 +75,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.languages.registerReferenceProvider({language: 'json'}, new ReferenceProvider(context))
+  );
+
+  context.subscriptions.push(
+    vscode.languages.registerDefinitionProvider(types, new IleniaDefinitionProvider(context))
   );
 
   context.subscriptions.push(disposable);
