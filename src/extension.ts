@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { languages } from 'vscode';
 import { getProjects, getLocalizations } from './files';
-import { initIndex, buildIndex } from './state';
+import {initIndex, buildIndex, rebuildIndex} from './state';
 import { findReferences, ReferenceProvider } from "./refs";
 import { IleniaCompletionItemProvider } from './intelisense';
 import { IleniaHoverProvider } from './hover';
@@ -43,6 +43,15 @@ export async function activate(context: vscode.ExtensionContext) {
         console.log(`You opened a ${doc.languageId} file`);
         await findReferences(context, doc);
       }
+    }
+  });
+
+  vscode.workspace.onDidChangeTextDocument(async (event: vscode.TextDocumentChangeEvent) => {
+    const doc = event.document;
+    if ([...types, 'json'].includes(doc.languageId) && doc.uri.scheme === "file" && doc.isDirty) {
+      console.log(`You changed a ${doc.languageId} file`);
+      await rebuildIndex(context, doc.uri);
+      await findReferences(context, doc);
     }
   });
 
