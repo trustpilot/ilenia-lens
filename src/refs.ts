@@ -2,17 +2,12 @@ import * as vscode from "vscode";
 import { getCurrentProject, getScripts } from "./files";
 import { CancellationToken, Location, Position, ReferenceContext, TextDocument } from "vscode";
 import { reverseTraverse } from './flatten';
-// let fs = require("fs");
 
-export async function findReferences(context: vscode.ExtensionContext, doc: vscode.TextDocument) {
+export async function findReferences(context: vscode.ExtensionContext, project: string) {
   const index = context.workspaceState.get('index') as any;
-  const project = await getCurrentProject(context, doc);
-  if (!project) { return; }
-  // Text search in all project files (too slow)
-  // Will need to do something about it in the future!
   const scripts = await getScripts(project);
   const projectIndex = index[project];
-  // Hotfix: cleanup all refs before reindex
+
   Object.keys(projectIndex.translations).map((translationId: string) => {
     projectIndex.translations[translationId].refs = [];
   });
@@ -33,7 +28,6 @@ export async function findReferences(context: vscode.ExtensionContext, doc: vsco
     await Promise.all(promises);
   });
   await Promise.all(promises);
-  // fs.writeFileSync('/Users/pov/git/hackathon/ilenia-lens/state.json', JSON.stringify(index, null, 2), 'utf8');
   await context.workspaceState.update('index', index);  
 }
 
@@ -46,6 +40,7 @@ export class ReferenceProvider implements vscode.ReferenceProvider {
 
   public async provideReferences(document: TextDocument, position: Position, context: ReferenceContext, token: CancellationToken): Promise<Location[]> {
     const project = await getCurrentProject(this.context, document);
+    if (!project) { return []; }
     const translationId = ReferenceProvider.getFlattenedTranslationId(document, position);
     const index = await this.context.workspaceState.get('index') as any;
     return index[project].translations[translationId].refs;

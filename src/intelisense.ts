@@ -11,6 +11,7 @@ export class IleniaCompletionItemProvider implements CompletionItemProvider {
     public async provideCompletionItems(document: TextDocument, position: Position): Promise<CompletionItem[]> {
         const index = await this.context.workspaceState.get('index') as any;
         const project = await getCurrentProject(this.context, document);
+        if (!project) { return []; }
         const { translations } = index[project];
 
         const linePrefix = document.lineAt(position).text.substr(0, position.character);

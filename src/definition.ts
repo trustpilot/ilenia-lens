@@ -13,6 +13,7 @@ export class IleniaDefinitionProvider implements vscode.DefinitionProvider {
 
     public async provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) {
         const project = await getCurrentProject(this.context, document);
+        if (!project) { return []; }
 
         const linePrefix = document.lineAt(position).text.substr(0, position.character);
         const leftTerms = linePrefix.split('"');

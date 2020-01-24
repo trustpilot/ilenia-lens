@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { languages } from 'vscode';
-import { getProjects, getLocalizations } from './files';
+import { getProjects, getCurrentProject, getProjectLocalizations } from './files';
 import {initIndex, buildIndex, rebuildIndex} from './state';
 import { findReferences, ReferenceProvider } from "./refs";
 import { IleniaCompletionItemProvider } from './intelisense';
@@ -24,8 +24,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const projects = await getProjects();
   await initIndex(context, projects);
-  const localizationFiles = await getLocalizations(projects);
-  await buildIndex(context, localizationFiles);
 
   let codelensProvider = new CodelensProvider(context.workspaceState.get('index'));
   languages.registerCodeLensProvider('*', codelensProvider);
@@ -41,17 +39,23 @@ export async function activate(context: vscode.ExtensionContext) {
       const doc = editor.document;
       if (types.includes(doc.languageId) && doc.uri.scheme === "file") {
         console.log(`You opened a ${doc.languageId} file`);
-        await findReferences(context, doc);
+        const project = await getCurrentProject(context, doc);
+        if (!project) { return; }
+        const localizationFiles = await getProjectLocalizations(project);
+        await buildIndex(context, localizationFiles);
+        await findReferences(context, project);
       }
     }
   });
 
   vscode.workspace.onDidChangeTextDocument(async (event: vscode.TextDocumentChangeEvent) => {
     const doc = event.document;
-    if ([...types, 'json'].includes(doc.languageId) && doc.uri.scheme === "file" && doc.isDirty) {
+    if (['json'].includes(doc.languageId) && doc.uri.scheme === "file" && doc.isDirty) {
       console.log(`You changed a ${doc.languageId} file`);
-      await rebuildIndex(context, doc.uri);
-      await findReferences(context, doc);
+      const project = await getCurrentProject(context, doc);
+      if (!project) { return; }
+      await rebuildIndex(context, doc, project);
+      await findReferences(context, project);
     }
   });
 
@@ -71,15 +75,7 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.languages.registerReferenceProvider({language: 'json'}, new ReferenceProvider(context))
   );
 
-  
   (await underline(context)).forEach(disposable => context.subscriptions.push(disposable));
-
-  context.subscriptions.push(vscode.commands.registerCommand('extension.helloWorld', (event) => {
-    // The code you place here will be executed every time your command is executed
-    // Display a message box to the user
-    vscode.window.showInformationMessage('Hello World');
-    console.log(event);
-  }));
 
   context.subscriptions.push(
     vscode.languages.registerDefinitionProvider(types, new IleniaDefinitionProvider(context))

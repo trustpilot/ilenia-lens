@@ -3,7 +3,7 @@
 	"name": "ilenia-lens",
 	"displayName": "Ilenia Lens",
 	"description": "",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
@@ -15,12 +15,7 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"commands": [
-			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
-			}
-		]
+		"commands": []
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
