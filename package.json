@@ -4,6 +4,7 @@
 	"displayName": "Ilenia Lens",
 	"description": "This extension is meant to provide productivity improvement when using translations in react with ilenia.",
 	"version": "1.0.0",
+	"license": "MIT",
 	"icon": "images/icon.png",
 	"engines": {
 		"vscode": "^1.41.0"
