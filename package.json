@@ -3,7 +3,7 @@
 	"name": "ilenia-lens",
 	"displayName": "Ilenia Lens",
 	"description": "This extension is meant to provide productivity improvement when using translations in react with ilenia.",
-	"version": "0.0.4",
+	"version": "1.0.0",
 	"icon": "images/icon.png",
 	"engines": {
 		"vscode": "^1.41.0"
@@ -39,5 +39,5 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/trustpilot/ilenia-lens"
-	  }
+	}
 }
